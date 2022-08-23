@@ -1,14 +1,26 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import { DeckDto } from './deck.dto';
+import { DeckService } from './deck.service';
 
 @Controller('deck')
 export class DeckController {
-  @Get('open')
-  open() {
-    return 'deck opened';
+  constructor(private deckService: DeckService) {}
+  @Get('open/:uuid')
+  async open(@Param() params) {
+    const uuid = params.uuid;
+    console.log('uuid', { uuid });
+    const deck = await this.deckService.get({ uuid });
+    return deck;
   }
 
   @Post('create')
-  create() {
-    return 'deck created';
+  async create(@Body() req: DeckDto) {
+    console.log('------------', { req });
+    console.log('req+++', { req });
+
+    const deck = await this.deckService.save(req);
+    console.log('deck from db !!!!!!!!!!!!!!!!!');
+    console.log('deck', deck);
+    return `deck creaddted: ${deck.uuid}`;
   }
 }

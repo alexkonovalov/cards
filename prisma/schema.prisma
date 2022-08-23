@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Deck {
+  id       Int          @id @default(autoincrement())
+  uuid     String       @default(uuid())
+  shuffled Boolean
+  type     Completeness
+  cards    Card[]
+}
+
+model Card {
+  id     Int  @id @default(autoincrement())
+  value  Rank
+  suit   Suit
+  deck   Deck @relation(fields: [deckId], references: [id])
+  deckId Int
+}
+
+enum Suit {
+  SPADES
+  CLUBS
+  HEARTS
+  DIAMONDS
+}
+
+enum Completeness {
+  FULL
+  SHORT
+}
+
+enum Rank {
+  F2
+  F3
+  F4
+  F5
+  F6
+  F7
+  F8
+  F9
+  F10
+  JACK
+  QUEEN
+  KING
+  ACE
+}
