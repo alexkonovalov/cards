@@ -1,23 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { Completeness, Rank, Suit } from '@prisma/client';
+import { Card, Completeness, Rank, Suit } from '@prisma/client';
+import { CardFactoryService } from 'src/card-factory/card-factory.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { shuffle } from 'src/utils/shuffle/shuffle.helper';
 import { DeckDto } from './deck.dto';
 
 @Injectable()
 export class DeckService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private cardFactoryService: CardFactoryService,
+    private prisma: PrismaService,
+  ) {}
 
-  async save(dto: DeckDto) {
+  async save({ type, shuffled }: DeckDto) {
+    const cards = this.cardFactoryService.generate(type === 'FULL');
+
     const deck = await this.prisma.deck.create({
       data: {
         cards: {
-          create: [
-            { value: Rank.F10, suit: Suit.CLUBS },
-            { value: Rank.ACE, suit: Suit.DIAMONDS },
-          ],
+          create: [...(shuffled ? shuffle(cards) : cards)],
         },
         type: Completeness.FULL,
-        shuffled: dto.shuffled,
+        shuffled: shuffled,
       },
     });
     return deck;

@@ -1,4 +1,6 @@
 import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import { Card } from '@prisma/client';
+import { CardFactoryService } from 'src/card-factory/card-factory.service';
 import { DeckDto } from './deck.dto';
 import { DeckService } from './deck.service';
 
