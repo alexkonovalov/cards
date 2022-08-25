@@ -1,15 +1,5 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-
-export class Card {
-  @IsString()
-  @IsNotEmpty()
+export class CardDto {
   value: string;
-
-  @IsString()
-  @IsNotEmpty()
   suit: string;
-
-  @IsString()
-  @IsNotEmpty()
   code: string;
 }

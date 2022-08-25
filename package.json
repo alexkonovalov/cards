@@ -1,11 +1,19 @@
 {
-  "name": "katana",
+  "name": "cards_api",
   "version": "0.0.1",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "db:dev:rm": "docker compose rm dev-db -s -f -v",
+    "db:dev:up": "docker compose up dev-db -d",
+    "db:dev:restart": "yarn db:dev:rm && yarn db:dev:up",
+    "db:dev:migrate": "prisma migrate deploy",
+    "db:test:rm": "docker compose rm test-db -s -f -v",
+    "db:test:up": "docker compose up test-db -d",
+    "db:test:restart": "yarn db:test:rm && yarn db:test:up",
+    "db:test:migrate": "dotenv -e .env.test -- prisma migrate deploy",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -18,14 +26,17 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "pretest:e2e": "yarn db:test:up && sleep 1 && yarn db:test:migrate",
+    "test:e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "dotenv-cli": "^6.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"

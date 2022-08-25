@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CardController } from './card.controller';
+import { CardFactoryService } from './card.factory.service';
 
 @Module({
-  controllers: [CardController]
+  providers: [CardFactoryService],
+  exports: [CardFactoryService],
 })
 export class CardModule {}

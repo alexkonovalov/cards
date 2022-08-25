@@ -7,7 +7,7 @@ Card Deck basic API
 ### 1. Create a deck of cards
 
 ```
-POST /deck
+POST /deck/create
 ```
 
 #### Examples:
@@ -15,7 +15,7 @@ POST /deck
 stretched & shuffled deck:
 
 ```bash
-curl --location --request POST 'localhost:3333/deck/create' \
+$ curl --location --request POST 'localhost:3333/deck/create' \
 --header 'Content-Type: application/json' \
 --data-raw '{ "type": "SHORT", "shuffled": true }
 '
@@ -24,7 +24,7 @@ curl --location --request POST 'localhost:3333/deck/create' \
 full & unshuffled deck:
 
 ```bash
-curl --location --request POST 'localhost:3333/deck/create' \
+$ curl --location --request POST 'localhost:3333/deck/create' \
 --header 'Content-Type: application/json' \
 --data-raw '{ "type": "FULL", "shuffled": false }
 '
@@ -38,10 +38,10 @@ GET  /deck/open
 
 #### Examples:
 
-Open deck with uuid `9ccb8d2a-da51-42e8-a06a-cf5910689ed7`
+Open deck with deckId `00112233-4455-6677-8899-aabbccddeeff`
 
 ```bash
-curl --location --request GET 'localhost:3333/deck/open/9ccb8d2a-da51-42e8-a06a-cf5910689ed7'
+$ curl --location --request GET 'localhost:3333/deck/open/00112233-4455-6677-8899-aabbccddeeff'
 ```
 
 ### 3. Draw from a deck
@@ -52,53 +52,65 @@ PUT  /deck/draw
 
 #### Examples:
 
-Draw 7 cards from deck with uuid `9ccb8d2a-da51-42e8-a06a-cf5910689ed7`
+Draw 7 cards from deck with deckId `00112233-4455-6677-8899-aabbccddeeff`
 
 ```bash
-curl --location --request PUT 'localhost:3333/deck/draw/9ccb8d2a-da51-42e8-a06a-cf5910689ed7' \
+$ curl --location --request PUT 'localhost:3333/deck/draw/00112233-4455-6677-8899-aabbccddeeff' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "count": 7
 }'
 ```
 
-## Installation
+## Installation & Prepare environment
+
+NB! `Docker`, `yarn` & `npm` should be already installed on your machine
+
+### First of all
 
 ```bash
-$ npm install
+$ yarn install
 ```
 
-## Running the app
+### To run service DEV mode:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ yarn run db:dev:up
+$ yarn run db:dev:migrate
+$ yarn run start
 ```
 
-## Test
+### To test service:
 
 ```bash
-# unit tests
-$ npm run test
+$ yarn run test
+```
 
-# e2e tests
-$ npm run test:e2e
+### To test e2e:
 
-# test coverage
-$ npm run test:cov
+```bash
+$ yarn run test:e2e
+```
+
+### To see test coverage:
+
+```bash
+$ yarn run test:cov
+```
+
+### To stop DB containers:
+
+```bash
+$ yarn db:test:rm
+$ yarn db:dev:rm
+
 ```
 
 ## Creator
 
 [Alexander Konovalov](https://github.com/alexkonovalov)
 
-## Build with [NestJS](https://nestjs.com/)
+## Built with [NestJS](https://nestjs.com/)
 
 <p align="left">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>

@@ -11,5 +11,16 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     networks:
       - katana
+  test-db:
+    image: postgres:13
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRRES_PASSWORD: 123
+      POSTGRES_DB: nest
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    networks:
+      - katana
 networks:
   katana:

@@ -11,16 +11,16 @@ datasource db {
 }
 
 model Deck {
-  id       Int          @id @default(autoincrement())
-  uuid     String       @default(uuid())
+  id       Int      @id @default(autoincrement())
+  uuid     String   @default(uuid())
   shuffled Boolean
-  type     Completeness
+  type     DeckType
   cards    Card[]
 }
 
 model Card {
   id     Int  @id @default(autoincrement())
-  value  Rank
+  rank   Rank
   suit   Suit
   deck   Deck @relation(fields: [deckId], references: [id])
   deckId Int
@@ -33,9 +33,9 @@ enum Suit {
   DIAMONDS
 }
 
-enum Completeness {
-  FULL
-  SHORT
+enum DeckType {
+  STANDARD
+  STRIPPED
 }
 
 enum Rank {

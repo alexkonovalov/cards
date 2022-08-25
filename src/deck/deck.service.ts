@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Card, Completeness, Deck, Prisma, Rank, Suit } from '@prisma/client';
-import { CardFactoryService } from 'src/card-factory/card-factory.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { shuffle } from 'src/utils/shuffle/shuffle.helper';
-import { DeckRequestDto } from './deck.dto';
+import { DeckType } from '@prisma/client';
+import { CardFactoryService } from '../card/card.factory.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { shuffle } from '../utils/shuffle/shuffle.helper';
 
 @Injectable()
 export class DeckService {
@@ -12,20 +11,17 @@ export class DeckService {
     private prisma: PrismaService,
   ) {}
 
-  async save({ type, shuffled }: DeckRequestDto) {
-    const completeness =
-      type === 'FULL' ? Completeness.FULL : Completeness.SHORT;
-    const cards = this.cardFactoryService.generate(
-      completeness === Completeness.FULL,
-    ); //todo improve
+  async save({ isFull, isShuffled }: { isFull: boolean; isShuffled: boolean }) {
+    const type = isFull ? DeckType.STANDARD : DeckType.STRIPPED;
+    const cards = this.cardFactoryService.generate(type === DeckType.STANDARD);
 
     const deck = await this.prisma.deck.create({
       data: {
         cards: {
-          create: [...(shuffled ? shuffle(cards) : cards)],
+          create: [...(isShuffled ? shuffle(cards) : cards)],
         },
-        type: completeness,
-        shuffled: shuffled,
+        type: type,
+        shuffled: isShuffled,
       },
     });
     return { deck, cardsCount: cards.length };

@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsBoolean, IsString, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsBoolean,
+  IsString,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
+import { CardDto } from '../card/card.dto';
+import { DeckCompleteness } from '../constants';
 
 export class DeckRequestDto {
   @IsBoolean()
@@ -6,20 +14,15 @@ export class DeckRequestDto {
   shuffled: boolean;
 
   @IsString()
+  @IsEnum(DeckCompleteness)
   @IsNotEmpty()
-  type: string;
+  type: DeckCompleteness;
 }
 
 export class DrawRequestDto {
   @IsNumber()
   @IsNotEmpty()
   count: number;
-}
-
-export class CardDto {
-  value: string;
-  suit: string;
-  code: string;
 }
 
 export class DeckResponseDto {

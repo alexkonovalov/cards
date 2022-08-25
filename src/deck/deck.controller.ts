@@ -8,11 +8,8 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  buildCardDto,
-  getCardCode,
-  getCardValue,
-} from 'src/utils/card.helpers';
+import { DeckCompleteness } from '../constants';
+import { buildCardDto } from '../card/card.helpers';
 import {
   DeckRequestDto,
   DeckFullResponseDto,
@@ -20,6 +17,7 @@ import {
   DrawRequestDto,
 } from './deck.dto';
 import { DeckService } from './deck.service';
+import { DeckType } from '@prisma/client';
 
 @Controller('deck')
 export class DeckController {
@@ -38,15 +36,18 @@ export class DeckController {
         HttpStatus.NOT_FOUND,
       );
     }
-    const cards = deck.cards.map(({ suit, value }) =>
-      buildCardDto({ suit, rank: value }),
-    );
 
-    console.log('deck', deck);
+    const cards = deck.cards.map(({ suit, rank }) =>
+      buildCardDto({ suit, rank }),
+    );
 
     const response: DeckFullResponseDto = {
       deckId: deck.uuid,
-      type: deck.type,
+      type:
+        deck.type === DeckType.STANDARD
+          ? DeckCompleteness.FULL
+          : DeckCompleteness.SHORT,
+
       shuffled: deck.shuffled,
       remaining: cards.length,
       cards,
@@ -56,17 +57,18 @@ export class DeckController {
   }
 
   @Post('create')
-  async create(@Body() req: DeckRequestDto) {
-    console.log('------------', { req });
-    console.log('req+++', { req });
-
-    const { deck, cardsCount } = await this.deckService.save(req);
-    console.log('deck from db !!!!!!!!!!!!!!!!!');
-    console.log('deck', deck);
+  async create(@Body() { shuffled, type }: DeckRequestDto) {
+    const { deck, cardsCount } = await this.deckService.save({
+      isFull: type === DeckCompleteness.FULL,
+      isShuffled: shuffled,
+    });
 
     const deckResponse: DeckResponseDto = {
       shuffled: deck.shuffled,
-      type: deck.type,
+      type:
+        deck.type === DeckType.STANDARD
+          ? DeckCompleteness.FULL
+          : DeckCompleteness.SHORT,
       deckId: deck.uuid,
       remaining: cardsCount,
     };
@@ -75,9 +77,10 @@ export class DeckController {
   }
 
   @Put('draw/:uuid/')
-  async draw(@Param('uuid') uuid: string, @Body() body: DrawRequestDto) {
-    return (await this.deckService.draw({ uuid, count: body.count })).map(
-      ({ suit, value }) => buildCardDto({ suit, rank: value }),
+  async draw(@Param('uuid') uuid: string, @Body() { count }: DrawRequestDto) {
+    const cards = (await this.deckService.draw({ uuid, count })).map(
+      ({ suit, rank }) => buildCardDto({ suit, rank }),
     );
+    return { cards };
   }
 }

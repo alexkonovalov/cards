@@ -1,12 +1,17 @@
 import { Module } from '@nestjs/common';
-import { CardModule } from './card/card.module';
 import { DeckModule } from './deck/deck.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { CardFactoryService } from './card-factory/card-factory.service';
-import { CardFactoryModule } from './card-factory/card-factory.module';
+import { CardFactoryService } from './card/card.factory.service';
+import { CardModule } from './card/card.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CardModule, DeckModule, PrismaModule, CardFactoryModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    DeckModule,
+    CardModule,
+  ],
   providers: [CardFactoryService],
 })
 export class AppModule {}
