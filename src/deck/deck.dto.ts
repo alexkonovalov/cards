@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsBoolean, IsString } from 'class-validator';
+import { IsNotEmpty, IsBoolean, IsString, IsNumber } from 'class-validator';
 
 export class DeckRequestDto {
   @IsBoolean()
@@ -8,6 +8,12 @@ export class DeckRequestDto {
   @IsString()
   @IsNotEmpty()
   type: string;
+}
+
+export class DrawRequestDto {
+  @IsNumber()
+  @IsNotEmpty()
+  count: number;
 }
 
 export class CardDto {

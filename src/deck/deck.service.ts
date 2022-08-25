@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Card, Completeness, Rank, Suit } from '@prisma/client';
+import { Card, Completeness, Deck, Prisma, Rank, Suit } from '@prisma/client';
 import { CardFactoryService } from 'src/card-factory/card-factory.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { shuffle } from 'src/utils/shuffle/shuffle.helper';
@@ -38,5 +38,19 @@ export class DeckService {
     });
 
     return deck;
+  }
+
+  async draw({ uuid, count }: { uuid: string; count: number }) {
+    const cards = await this.prisma.card.findMany({
+      where: { deck: { uuid } },
+      orderBy: { id: 'desc' },
+      take: count,
+    });
+
+    await this.prisma.card.deleteMany({
+      where: { id: { in: cards.map(({ id }) => id) } },
+    });
+
+    return cards;
   }
 }

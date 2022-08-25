@@ -1,4 +1,5 @@
 import { Rank, Suit } from '@prisma/client';
+import { CardDto } from 'src/deck/deck.dto';
 
 const NUMBER_RANKS: Rank[] = [
   Rank.F2,
@@ -40,5 +41,17 @@ export const getCardCode = (suit: Suit, rank: Rank) => {
 };
 
 export const getCardValue = (rank: Rank): string => {
-  return NUMBER_RANKS.includes(rank) ? rankMap.get(rank) : rank;
+  return NUMBER_RANKS.includes(rank) ? rankMap.get(rank)! : rank;
 };
+
+export const buildCardDto = ({
+  suit,
+  rank,
+}: {
+  suit: Suit;
+  rank: Rank;
+}): CardDto => ({
+  value: getCardValue(rank),
+  code: getCardCode(suit, rank),
+  suit: Suit[suit],
+});

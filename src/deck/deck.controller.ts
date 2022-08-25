@@ -1,28 +1,48 @@
-import { Body, Controller, Get, Post, Param } from '@nestjs/common';
-import { Card, Suit } from '@prisma/client';
-import { CardFactoryService } from 'src/card-factory/card-factory.service';
-import { getCardCode, getCardValue } from 'src/utils/card.helpers';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Param,
+  Put,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  buildCardDto,
+  getCardCode,
+  getCardValue,
+} from 'src/utils/card.helpers';
 import {
   DeckRequestDto,
   DeckFullResponseDto,
   DeckResponseDto,
+  DrawRequestDto,
 } from './deck.dto';
 import { DeckService } from './deck.service';
 
 @Controller('deck')
 export class DeckController {
   constructor(private deckService: DeckService) {}
+
   @Get('open/:uuid')
-  async open(@Param() params) {
-    const uuid = params.uuid;
-    console.log('uuid', { uuid });
+  async open(@Param('uuid') uuid: string) {
     const deck = await this.deckService.get({ uuid });
-    console.log('deck_cards:::', deck.cards);
-    const cards = deck.cards.map((card) => ({
-      value: getCardValue(card.value),
-      code: getCardCode(card.suit, card.value),
-      suit: Suit[card.suit],
-    }));
+
+    if (deck === null) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'The deck is not found',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const cards = deck.cards.map(({ suit, value }) =>
+      buildCardDto({ suit, rank: value }),
+    );
+
+    console.log('deck', deck);
 
     const response: DeckFullResponseDto = {
       deckId: deck.uuid,
@@ -52,5 +72,12 @@ export class DeckController {
     };
 
     return deckResponse;
+  }
+
+  @Put('draw/:uuid/')
+  async draw(@Param('uuid') uuid: string, @Body() body: DrawRequestDto) {
+    return (await this.deckService.draw({ uuid, count: body.count })).map(
+      ({ suit, value }) => buildCardDto({ suit, rank: value }),
+    );
   }
 }
